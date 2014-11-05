@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker http://texturepacker.com-->
+<!-- $TexturePacker:SmartUpdate:f3103f039adfbea5dc6bb816921eb96a$ -->
+<TextureAtlas imagePath="Poker.png">
+    <SubTexture name="Button_Return_0" x="477" y="188" width="93" height="44"/>
+    <SubTexture name="Button_Return_1" x="382" y="188" width="93" height="44"/>
+    <SubTexture name="Button_Return_2" x="287" y="188" width="93" height="44"/>
+    <SubTexture name="Button_Start_0" x="192" y="188" width="93" height="44"/>
+    <SubTexture name="Button_Start_1" x="97" y="188" width="93" height="44"/>
+    <SubTexture name="Button_Start_2" x="2" y="188" width="93" height="44"/>
+    <SubTexture name="Poker_1_1" x="1796" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_1_10" x="1865" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_1_11" x="1796" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_1_12" x="1727" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_1_13" x="1727" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_1_2" x="1658" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_1_3" x="1658" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_1_4" x="1589" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_1_5" x="1589" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_1_6" x="1520" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_1_7" x="1520" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_1_8" x="1451" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_1_9" x="1451" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_2_1" x="1382" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_2_10" x="1382" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_2_11" x="1313" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_2_12" x="1313" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_2_13" x="1244" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_2_2" x="1244" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_2_3" x="1175" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_2_4" x="1175" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_2_5" x="1106" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_2_6" x="1106" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_2_7" x="1037" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_2_8" x="1037" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_2_9" x="968" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_3_1" x="968" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_3_10" x="899" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_3_11" x="899" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_3_12" x="830" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_3_13" x="830" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_3_2" x="761" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_3_3" x="761" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_3_4" x="692" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_3_5" x="692" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_3_6" x="623" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_3_7" x="623" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_3_8" x="554" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_3_9" x="554" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_4_1" x="485" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_4_10" x="485" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_4_11" x="416" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_4_12" x="416" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_4_13" x="347" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_4_2" x="347" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_4_3" x="278" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_4_4" x="278" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_4_5" x="209" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_4_6" x="209" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_4_7" x="140" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_4_8" x="140" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_4_9" x="71" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_5_14" x="71" y="2" width="67" height="91"/>
+    <SubTexture name="Poker_5_15" x="2" y="95" width="67" height="91"/>
+    <SubTexture name="Poker_6_0" x="2" y="2" width="67" height="91"/>
+</TextureAtlas>

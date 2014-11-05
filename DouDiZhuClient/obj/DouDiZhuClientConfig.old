@@ -16,7 +16,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'2014/10/9'</value>
+      <value>'2014/11/5'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -41,9 +41,9 @@
     <path-element>E:\MyProject\GitHubFirstGame\FirstGame\DouDiZhuClient\src\Main.as</path-element>
   </file-specs>
   <default-background-color>#FFFFFF</default-background-color>
-  <default-frame-rate>30</default-frame-rate>
+  <default-frame-rate>60</default-frame-rate>
   <default-size>
-    <width>800</width>
-    <height>600</height>
+    <width>1024</width>
+    <height>650</height>
   </default-size>
 </flex-config>

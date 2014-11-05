@@ -19,7 +19,11 @@ package
 		private function init(e:Event = null):void 
 		{
 			removeEventListener(Event.ADDED_TO_STAGE, init);
-			// entry point
+			
+			//设置舞台
+			stage.stageWidth = 1024;
+			stage.stageHeight = 650;
+			stage.frameRate = 60;
 			
 			var mainGame:MainGame = new MainGame;
 			addChild(mainGame);
