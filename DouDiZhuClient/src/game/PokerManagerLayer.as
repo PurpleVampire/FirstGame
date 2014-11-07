@@ -16,7 +16,8 @@ package game
 	{
 		public static var sPokerManagerLayer:PokerManagerLayer = new PokerManagerLayer;//单例模式
 		
-		private var mPokerManagers:Array = [];
+		private var mHandPokerManagers:Array = [];	//手牌控件
+		private var mOutPokerManagers:Array = [];	//出牌控件
 		
 		public function PokerManagerLayer() 
 		{
@@ -37,33 +38,78 @@ package game
 			
 			//自身玩家的扑克控件
 			var mePokerManager:PokerManager = new PokerManager;
-			mePokerManager.SetParameter(PokerManager.POSITION_ME, 25, "Poker");
-			mePokerManager.y = 450;
+			mePokerManager.SetParameter(PokerManager.POSITION_ME, 26, "Poker");
+			mePokerManager.y = 500;
 			addChild(mePokerManager);
-			mPokerManagers.push(mePokerManager);
+			mHandPokerManagers.push(mePokerManager);
 			
 			//右边玩家的扑克控件
 			var rightPokerManager:PokerManager = new PokerManager;
-			rightPokerManager.SetParameter(PokerManager.POSITION_RIGHT, 30, "Poker");
-			rightPokerManager.x = stage.stageWidth - 100;
+			rightPokerManager.SetParameter(PokerManager.POSITION_RIGHT, 26, "Poker");
 			rightPokerManager.touchable = false;
+			rightPokerManager.x = stage.stageWidth - 100;
 			addChild(rightPokerManager);
-			mPokerManagers.push(rightPokerManager);
+			mHandPokerManagers.push(rightPokerManager);
 			
 			//左边玩家的扑克控件
 			var leftPokerManager:PokerManager = new PokerManager;
-			leftPokerManager.SetParameter(PokerManager.POSITION_LEFT, 30, "Poker");
-			leftPokerManager.x = 100;
+			leftPokerManager.SetParameter(PokerManager.POSITION_LEFT, 26, "Poker");
 			leftPokerManager.touchable = false;
+			leftPokerManager.x = 100;
 			addChild(leftPokerManager);
-			mPokerManagers.push(leftPokerManager);
+			mHandPokerManagers.push(leftPokerManager);
+			
+			//自身玩家的出牌
+			var meOutPokerManager:PokerManager = new PokerManager;
+			meOutPokerManager.SetParameter(PokerManager.POSITION_ME, 26, "Poker", false);
+			meOutPokerManager.touchable = false;
+			meOutPokerManager.y = 350;
+			addChild(meOutPokerManager);
+			mOutPokerManagers.push(meOutPokerManager);
+			
+			//右边玩家的出牌
+			var rightOutPokerManager:PokerManager = new PokerManager;
+			rightOutPokerManager.SetParameter(PokerManager.POSITION_ME, 26, "Poker", false);
+			rightOutPokerManager.touchable = false;
+			rightOutPokerManager.y = 200;
+			addChild(rightOutPokerManager);
+			mOutPokerManagers.push(rightOutPokerManager);
+			
+			//左边玩家的出牌
+			var leftOutPokerManager:PokerManager = new PokerManager;
+			leftOutPokerManager.SetParameter(PokerManager.POSITION_ME, 26, "Poker", false);
+			leftOutPokerManager.touchable = false;
+			leftOutPokerManager.y = 200;
+			addChild(leftOutPokerManager);
+			mOutPokerManagers.push(leftOutPokerManager);
 		}
 		
-		//添加扑克牌
-		public function AddPoker(viewSeatID:int, pokerValue:Number):void
+		//添加手牌扑克牌
+		public function AddHandPoker(viewSeatID:int, pokerValue:Number):void
 		{
-			var tempPokerManager:PokerManager = mPokerManagers[viewSeatID] as PokerManager;
+			var tempPokerManager:PokerManager = mHandPokerManagers[viewSeatID] as PokerManager;
 			tempPokerManager.AddPoker(pokerValue);
+		}
+		
+		//插入3张底牌
+		public function InsertPokers(viewSeatID:int, pokerValues:Array):void
+		{
+			var tempPokerManager:PokerManager = mHandPokerManagers[viewSeatID] as PokerManager;
+			tempPokerManager.InsertPokers(pokerValues);
+		}
+		
+		//添加出牌扑克牌
+		public function AddOutPokers(viewSeatID:int, pokerValues:Array):void
+		{
+			var tempPokerManager:PokerManager = mOutPokerManagers[viewSeatID] as PokerManager;
+			tempPokerManager.AddPokers(pokerValues);
+			
+			if (viewSeatID == 0)
+				tempPokerManager.x = int((stage.stageWidth - tempPokerManager.width) / 2);
+			else if(viewSeatID == 1)
+				tempPokerManager.x = stage.stageWidth - tempPokerManager.width - 150;
+			else if (viewSeatID == 2)
+				tempPokerManager.x = 150;
 		}
 	}
 }

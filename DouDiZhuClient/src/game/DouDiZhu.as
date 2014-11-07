@@ -1,5 +1,8 @@
 package game 
 {
+	import help.GameData;
+	import help.PlayerData;
+	import help.PokerHelp;
 	import myPoker.PokerManager;
 	import starling.animation.IAnimatable;
 	import starling.core.Starling;
@@ -14,9 +17,7 @@ package game
 	{
 		public static var sDouDiZhu:DouDiZhu = new DouDiZhu;//单例模式
 		
-		private var mePokerValues:Array = [0x11, 0x12, 0x23, 0x24, 0x34, 0x35, 0x37, 0x38, 0x39, 0x41, 0x42, 0x43, 0x44, 0x45, 0x49, 0x4a, 0x4b];
-		private var upPokerValues:Array = [0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60];
-		private var index:int = 0;
+		private var mIndex:int = 0;
 		
 		public function DouDiZhu() 
 		{
@@ -35,22 +36,75 @@ package game
 		{
 			this.removeEventListener(Event.ADDED_TO_STAGE, Init);
 			
+			//添加背景
+			addChild(BackgroundLayer.sBackgroundLayer);
+			
+			//添加3个玩家的扑克牌层
+			addChild(PokerManagerLayer.sPokerManagerLayer);
+			
+			//添加操作层
+			addChild(OperateLayer.sOperateLayer);
+			
+			//添加操作状态层
+			addChild(OperateStateLayer.sOperateStateLayer);
+			
 			//添加开始层
 			addChild(StartLayer.sStartLayer);
 			StartLayer.sStartLayer.x = (stage.stageWidth - StartLayer.sStartLayer.width) / 2;
 			StartLayer.sStartLayer.y = (stage.stageHeight - StartLayer.sStartLayer.height) / 2;
+		}
+		
+		//游戏开始
+		public function GameStart():void
+		{
+			//洗牌
+			var pokerValues:Array = PokerHelp.Shuffle();
 			
-			//添加3个玩家的扑克牌层
-			addChild(PokerManagerLayer.sPokerManagerLayer);
+			//发牌
+			(GameData.gGameData.mPlayerDatas[0] as PlayerData).mHandPokers = pokerValues.slice(0, 17);
+			(GameData.gGameData.mPlayerDatas[1] as PlayerData).mHandPokers = pokerValues.slice(17, 34);
+			(GameData.gGameData.mPlayerDatas[2] as PlayerData).mHandPokers = pokerValues.slice(34, 51);
+			GameData.gGameData.mDiPais = pokerValues.slice(51, 54);
+			
+			//排序
+			PokerHelp.SortByValue((GameData.gGameData.mPlayerDatas[0] as PlayerData).mHandPokers);
+			PokerHelp.SortByValue((GameData.gGameData.mPlayerDatas[1] as PlayerData).mHandPokers);
+			PokerHelp.SortByValue((GameData.gGameData.mPlayerDatas[2] as PlayerData).mHandPokers);
+			
+			Starling.juggler.repeatCall(AddPoker, 0.2, 17);
 		}
 		
 		//添加扑克牌
 		public function AddPoker():void
 		{
-			PokerManagerLayer.sPokerManagerLayer.AddPoker(0, mePokerValues[index]);
-			PokerManagerLayer.sPokerManagerLayer.AddPoker(1, upPokerValues[index]);
-			PokerManagerLayer.sPokerManagerLayer.AddPoker(2, upPokerValues[index]);
-			index++;
+			PokerManagerLayer.sPokerManagerLayer.AddHandPoker(0, (GameData.gGameData.mPlayerDatas[0] as PlayerData).mHandPokers[mIndex]);
+			PokerManagerLayer.sPokerManagerLayer.AddHandPoker(1, (GameData.gGameData.mPlayerDatas[1] as PlayerData).mHandPokers[mIndex]);
+			PokerManagerLayer.sPokerManagerLayer.AddHandPoker(2, (GameData.gGameData.mPlayerDatas[2] as PlayerData).mHandPokers[mIndex]);
+			mIndex++;
+			
+			if (mIndex == 17)
+				OperateLayer.sOperateLayer.SetJiao();
+		}
+		
+		//叫地主
+		public function JiaoDiZhu(viewSeatID:int, bJiao:Boolean):void
+		{
+			OperateStateLayer.sOperateStateLayer.SetState(viewSeatID, bJiao ? "叫地主" : "不叫");
+			
+			if(viewSeatID == 0)
+				OperateLayer.sOperateLayer.Reset();
+			
+			//添加三张牌
+			PokerManagerLayer.sPokerManagerLayer.InsertPokers(0, GameData.gGameData.mDiPais);
+		}
+		
+		//抢地主
+		public function QiangDiZhu(viewSeatID:int, bQiang:Boolean):void
+		{
+			OperateStateLayer.sOperateStateLayer.SetState(viewSeatID, bQiang ? "抢地主" : "不抢");
+			
+			if (viewSeatID == 0)
+				OperateLayer.sOperateLayer.Reset();
 		}
 	}
 }

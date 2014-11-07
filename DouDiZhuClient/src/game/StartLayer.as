@@ -71,7 +71,7 @@ package game
 		private function Start():void
 		{
 			DouDiZhu.sDouDiZhu.removeChild(this);
-			Starling.juggler.repeatCall(DouDiZhu.sDouDiZhu.AddPoker, 0.2, 17);
+			DouDiZhu.sDouDiZhu.GameStart();
 		}
 		
 		//返回

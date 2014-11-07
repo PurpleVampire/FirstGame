@@ -26,11 +26,11 @@ package myPoker {
 			
 			//计算花色和牌面数字
 			mPokerValue = pokerValue;
-			mSuit = pokerValue >> 4;
-			mValue = pokerValue & 0x0f;
+			mSuit = pokerValue & 0x0f;
+			mValue = pokerValue >> 4;
 			
 			//设置扑克牌
-			this.texture = Asset.GetPoker().getTexture(pokerName + "_" + mSuit + "_" + mValue);
+			this.texture = Asset.GetPoker().getTexture(pokerName + "_" + mValue + "_" + mSuit);
 		}
 	}
 }
