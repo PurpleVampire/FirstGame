@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with TexturePacker http://texturepacker.com-->
-<!-- $TexturePacker:SmartUpdate:60463fc78f166de635ea5ae52137bea0$ -->
+<!-- $TexturePacker:SmartUpdate:5034d5f403c36fdb3fd56c5141ec7f2f$ -->
 <TextureAtlas imagePath="Poker.png">
     <SubTexture name="Button_Return_0" x="477" y="188" width="93" height="44"/>
     <SubTexture name="Button_Return_1" x="382" y="188" width="93" height="44"/>
@@ -8,6 +8,17 @@
     <SubTexture name="Button_Start_0" x="192" y="188" width="93" height="44"/>
     <SubTexture name="Button_Start_1" x="97" y="188" width="93" height="44"/>
     <SubTexture name="Button_Start_2" x="2" y="188" width="93" height="44"/>
+    <SubTexture name="Countdown_Bg" x="1865" y="95" width="55" height="45"/>
+    <SubTexture name="Countdown_Number_0" x="667" y="188" width="17" height="29"/>
+    <SubTexture name="Countdown_Number_1" x="739" y="188" width="3" height="27" frameX="-14" frameY="-1" frameWidth="17" frameHeight="29"/>
+    <SubTexture name="Countdown_Number_2" x="648" y="188" width="17" height="29"/>
+    <SubTexture name="Countdown_Number_3" x="703" y="188" width="15" height="29" frameX="-2" frameY="0" frameWidth="17" frameHeight="29"/>
+    <SubTexture name="Countdown_Number_4" x="720" y="188" width="17" height="27" frameX="0" frameY="-1" frameWidth="17" frameHeight="29"/>
+    <SubTexture name="Countdown_Number_5" x="629" y="188" width="17" height="29"/>
+    <SubTexture name="Countdown_Number_6" x="610" y="188" width="17" height="29"/>
+    <SubTexture name="Countdown_Number_7" x="686" y="188" width="15" height="29" frameX="-2" frameY="0" frameWidth="17" frameHeight="29"/>
+    <SubTexture name="Countdown_Number_8" x="591" y="188" width="17" height="29"/>
+    <SubTexture name="Countdown_Number_9" x="572" y="188" width="17" height="29"/>
     <SubTexture name="Poker_0_0" x="1796" y="95" width="67" height="91"/>
     <SubTexture name="Poker_10_1" x="1865" y="2" width="67" height="91"/>
     <SubTexture name="Poker_10_2" x="1796" y="2" width="67" height="91"/>

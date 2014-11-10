@@ -1,6 +1,7 @@
 package game 
 {
 	import help.GameData;
+	import help.GameLogic;
 	import help.PlayerData;
 	import help.PokerHelp;
 	import myPoker.PokerManager;
@@ -55,21 +56,12 @@ package game
 		}
 		
 		//游戏开始
-		public function GameStart():void
+		public function GameStart(meHandPokers:Array, rightHandPokers:Array, leftHandPokers:Array):void
 		{
-			//洗牌
-			var pokerValues:Array = PokerHelp.Shuffle();
-			
-			//发牌
-			(GameData.gGameData.mPlayerDatas[0] as PlayerData).mHandPokers = pokerValues.slice(0, 17);
-			(GameData.gGameData.mPlayerDatas[1] as PlayerData).mHandPokers = pokerValues.slice(17, 34);
-			(GameData.gGameData.mPlayerDatas[2] as PlayerData).mHandPokers = pokerValues.slice(34, 51);
-			GameData.gGameData.mDiPais = pokerValues.slice(51, 54);
-			
-			//排序
-			PokerHelp.SortByValue((GameData.gGameData.mPlayerDatas[0] as PlayerData).mHandPokers);
-			PokerHelp.SortByValue((GameData.gGameData.mPlayerDatas[1] as PlayerData).mHandPokers);
-			PokerHelp.SortByValue((GameData.gGameData.mPlayerDatas[2] as PlayerData).mHandPokers);
+			//三家手牌数据，目前要测试机器人AI，所以传3个人的数据，后期只传自己的数据，其他人的数据为未知
+			(GameData.gGameData.mPlayerDatas[0] as PlayerData).mHandPokers = meHandPokers.slice(0);
+			(GameData.gGameData.mPlayerDatas[1] as PlayerData).mHandPokers = rightHandPokers.slice(0);
+			(GameData.gGameData.mPlayerDatas[2] as PlayerData).mHandPokers = leftHandPokers.slice(0);
 			
 			Starling.juggler.repeatCall(AddPoker, 0.2, 17);
 		}
@@ -82,26 +74,23 @@ package game
 			PokerManagerLayer.sPokerManagerLayer.AddHandPoker(2, (GameData.gGameData.mPlayerDatas[2] as PlayerData).mHandPokers[mIndex]);
 			mIndex++;
 			
-			if (mIndex == 17)
-				OperateLayer.sOperateLayer.SetJiao();
+			//if (mIndex == 17)
+				//OperateLayer.sOperateLayer.SetJiao();
 		}
 		
 		//叫地主
 		public function JiaoDiZhu(viewSeatID:int, bJiao:Boolean):void
 		{
-			OperateStateLayer.sOperateStateLayer.SetState(viewSeatID, bJiao ? "叫地主" : "不叫");
+			GameLogic.gGameLogic.JiaoDiZhu(bJiao);
 			
 			if(viewSeatID == 0)
 				OperateLayer.sOperateLayer.Reset();
-			
-			//添加三张牌
-			PokerManagerLayer.sPokerManagerLayer.InsertPokers(0, GameData.gGameData.mDiPais);
 		}
 		
 		//抢地主
 		public function QiangDiZhu(viewSeatID:int, bQiang:Boolean):void
 		{
-			OperateStateLayer.sOperateStateLayer.SetState(viewSeatID, bQiang ? "抢地主" : "不抢");
+			GameLogic.gGameLogic.QiangDiZhu(bQiang);
 			
 			if (viewSeatID == 0)
 				OperateLayer.sOperateLayer.Reset();

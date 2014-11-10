@@ -1,5 +1,6 @@
 package game 
 {
+	import help.GameLogic;
 	import mylib.Asset;
 	import mylib.MyButton;
 	import starling.core.Starling;
@@ -71,7 +72,7 @@ package game
 		private function Start():void
 		{
 			DouDiZhu.sDouDiZhu.removeChild(this);
-			DouDiZhu.sDouDiZhu.GameStart();
+			GameLogic.gGameLogic.GameStart();
 		}
 		
 		//返回

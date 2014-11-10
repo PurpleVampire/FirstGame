@@ -44,13 +44,13 @@ package game
 			
 			//叫地主
 			mJiao = new MyButton(greenNormal, "叫地主", greenDown, greenOver);
-			mJiao.x = int((stage.stageWidth - greenNormal.width - yellowNormal.width - 50) / 2);
-			mJiao.y = 450;
+			mJiao.x = int((stage.stageWidth - greenNormal.width - yellowNormal.width - 80) / 2);
+			mJiao.y = 440;
 			addChild(mJiao);
 			
 			//不叫
 			mBuJiao = new MyButton(yellowNormal, "不叫", yellowDown, yellowOver);
-			mBuJiao.x = mJiao.x + mJiao.width + 50;
+			mBuJiao.x = mJiao.x + mJiao.width + 80;
 			mBuJiao.y = mJiao.y;
 			addChild(mBuJiao);
 			

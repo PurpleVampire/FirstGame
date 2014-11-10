@@ -21,8 +21,8 @@ package myPoker {
 		//设置扑克 第一个参数为0xff格式的扑克值，第二个参数为扑克名Poker_1_3中的前缀"Poker"
 		public function SetPoker(pokerValue:Number, pokerName:String):void
 		{
-			if (pokerValue == 0)
-				throw new Error("扑克值不能为0");
+			//if (pokerValue == 0)
+				//throw new Error("扑克值不能为0");
 			
 			//计算花色和牌面数字
 			mPokerValue = pokerValue;

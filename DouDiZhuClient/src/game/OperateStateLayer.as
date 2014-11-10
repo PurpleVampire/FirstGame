@@ -1,5 +1,7 @@
 package game 
 {
+	import component.Countdown;
+	import myPoker.PokerManager;
 	import starling.display.Sprite;
 	import starling.events.Event;
 	import starling.text.TextField;
@@ -12,7 +14,9 @@ package game
 	{
 		public static var sOperateStateLayer:OperateStateLayer = new OperateStateLayer;	//单例模式
 		
-		private var mStates:Array = [];	//视图座位号
+		private var mStates:Array = [];			//视图座位号
+		private var mDiPaiManager:PokerManager;	//底牌控件
+		private var mCountdown:Countdown;		//倒计时
 		
 		public function OperateStateLayer() 
 		{
@@ -49,6 +53,17 @@ package game
 			leftTextField.y = 250;
 			addChild(leftTextField);
 			mStates.push(leftTextField);
+			
+			//底牌控件
+			mDiPaiManager = new PokerManager;
+			mDiPaiManager.SetParameter(PokerManager.POSITION_ME, 67, "Poker", false);
+			mDiPaiManager.touchable = false;
+			addChild(mDiPaiManager);
+			
+			//倒计时
+			mCountdown = new Countdown;
+			addChild(mCountdown);
+			mCountdown.visible = false;
 		}
 		
 		//设置状态
@@ -56,6 +71,38 @@ package game
 		{
 			var textField:TextField = mStates[viewSeatID] as TextField;
 			textField.text = state;
+		}
+		
+		//设置底牌
+		public function SetThreePokers(pokerValues:Array):void
+		{
+			//添加前先清空
+			mDiPaiManager.removeChildren();
+			mDiPaiManager.AddPokers(pokerValues);
+			mDiPaiManager.x = int((stage.stageWidth - mDiPaiManager.width) / 2);
+		}
+		
+		//设置倒计时
+		public function SetCountdown(viewSeatID:int, time:int):void
+		{
+			mCountdown.visible = true;
+			mCountdown.SetTime(time);
+			
+			if (viewSeatID == 0)
+			{
+				mCountdown.x = int((stage.stageWidth - mCountdown.width) / 2);
+				mCountdown.y = stage.stageHeight - 210;
+			}
+			else if (viewSeatID == 1)
+			{
+				mCountdown.x = stage.stageWidth - mCountdown.width - 150;
+				mCountdown.y = stage.stageHeight - 300;// 400;
+			}
+			else if (viewSeatID == 2)
+			{
+				mCountdown.x = 150;
+				mCountdown.y = stage.stageHeight - 300;// 400;
+			}
 		}
 	}
 }
