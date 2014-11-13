@@ -47,6 +47,38 @@ package myPoker {
 			mbMovie = bMovie;
 		}
 		
+		//得到弹起的扑克
+		public function GetUpPokers():Array
+		{
+			var pokerValues:Array = [];
+			for (var i:int = 0; i < this.numChildren; i++)
+			{
+				var poker:Poker = this.getChildAt(i) as Poker;
+				if(poker.y == UP_HEIGHT)
+					pokerValues.push(poker.mPokerValue);
+			}
+			return pokerValues;
+		}
+		
+		//移除扑克牌
+		public function RemovePokers(pokerValues:Array):void
+		{
+			for (var i:int = 0; i < pokerValues.length; i++)
+			{
+				for (var j:int = 0; j < this.numChildren; j++)
+				{
+					var poker:Poker = this.getChildAt(j) as Poker;
+					if (poker.mPokerValue == pokerValues[i])
+					{
+						this.removeChild(poker, true);
+						break;
+					}
+				}
+			}
+			
+			UpdatePosition();
+		}
+		
 		//插入扑克牌（地主需要的3张牌）
 		public function InsertPokers(pokerValues:Array):void
 		{

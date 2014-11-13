@@ -91,17 +91,39 @@ package game
 			tempPokerManager.AddPoker(pokerValue);
 		}
 		
-		//插入3张底牌
+		//插入手牌3张底牌
 		public function InsertPokers(viewSeatID:int, pokerValues:Array):void
 		{
 			var tempPokerManager:PokerManager = mHandPokerManagers[viewSeatID] as PokerManager;
 			tempPokerManager.InsertPokers(pokerValues);
 		}
 		
+		//移除手牌出的牌
+		public function RemoveHandPokers(viewSeatID:int, pokerValues:Array):void
+		{
+			var tempPokerManager:PokerManager = mHandPokerManagers[viewSeatID] as PokerManager;
+			tempPokerManager.RemovePokers(pokerValues);
+		}
+		
+		//得到弹起的牌
+		public function GetUpPokers():Array
+		{
+			var tempPokerManager:PokerManager = mHandPokerManagers[0] as PokerManager;
+			return tempPokerManager.GetUpPokers();
+		}
+		
+		//清空出牌扑克牌
+		public function RemoveOutPokers(viewSeatID:int):void
+		{
+			var tempPokerManager:PokerManager = mOutPokerManagers[viewSeatID] as PokerManager;
+			tempPokerManager.removeChildren();
+		}
+		
 		//添加出牌扑克牌
 		public function AddOutPokers(viewSeatID:int, pokerValues:Array):void
 		{
 			var tempPokerManager:PokerManager = mOutPokerManagers[viewSeatID] as PokerManager;
+			tempPokerManager.removeChildren();
 			tempPokerManager.AddPokers(pokerValues);
 			
 			if (viewSeatID == 0)

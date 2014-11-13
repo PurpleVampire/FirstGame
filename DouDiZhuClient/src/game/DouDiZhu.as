@@ -1,6 +1,7 @@
 package game 
 {
 	import help.GameData;
+	import help.GameHelp;
 	import help.GameLogic;
 	import help.PlayerData;
 	import help.PokerHelp;
@@ -18,6 +19,7 @@ package game
 	{
 		public static var sDouDiZhu:DouDiZhu = new DouDiZhu;//单例模式
 		
+		private var mGameHelp:GameHelp;	//游戏帮助类
 		private var mIndex:int = 0;
 		
 		public function DouDiZhu() 
@@ -36,6 +38,8 @@ package game
 		private function Init(e:Event):void
 		{
 			this.removeEventListener(Event.ADDED_TO_STAGE, Init);
+			
+			mGameHelp = new GameHelp(3);
 			
 			//添加背景
 			addChild(BackgroundLayer.sBackgroundLayer);
@@ -90,10 +94,31 @@ package game
 		//抢地主
 		public function QiangDiZhu(viewSeatID:int, bQiang:Boolean):void
 		{
-			GameLogic.gGameLogic.QiangDiZhu(bQiang);
-			
 			if (viewSeatID == 0)
 				OperateLayer.sOperateLayer.Reset();
+			
+			GameLogic.gGameLogic.QiangDiZhu(bQiang);
+		}
+		
+		//打牌
+		public function OutCard(outLogicSeatID:int, pokerValues:Array, nextLogicSeatID:int):void
+		{
+			//出牌玩家的操作
+			var outViewSeatID:int = mGameHelp.GetViewSeatByLogicSeat(outLogicSeatID, GameData.gGameData.mSelfLogicSeatID);
+			PokerManagerLayer.sPokerManagerLayer.AddOutPokers(outViewSeatID, pokerValues);
+			PokerManagerLayer.sPokerManagerLayer.RemoveHandPokers(outViewSeatID, pokerValues);
+			
+			//下一个玩家的操作
+			var nextViewSeatID:int = mGameHelp.GetViewSeatByLogicSeat(nextLogicSeatID, GameData.gGameData.mSelfLogicSeatID);
+			PokerManagerLayer.sPokerManagerLayer.RemoveOutPokers(nextViewSeatID);
+			OperateStateLayer.sOperateStateLayer.SetCountdown(nextViewSeatID, 20);
+			
+			//如果下一个操作的玩家是自己，显示打牌操作
+			if (nextViewSeatID == 0)
+				OperateLayer.sOperateLayer.SetPlayCard(false);
+			
+			//刷新逻辑
+			GameLogic.gGameLogic.OutCardSuccess(outLogicSeatID, pokerValues, nextLogicSeatID);
 		}
 	}
 }

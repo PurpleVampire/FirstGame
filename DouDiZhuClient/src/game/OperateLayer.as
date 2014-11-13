@@ -18,6 +18,9 @@ package game
 		private var mBuJiao:MyButton;	//不叫
 		private var mQiang:MyButton;	//抢地主
 		private var mBuQiang:MyButton;	//不抢
+		private var mBuChu:MyButton;	//不出
+		private var mTiShi:MyButton;	//提示
+		private var mChuPai:MyButton;	//出牌
 		
 		public function OperateLayer() 
 		{
@@ -66,6 +69,24 @@ package game
 			mBuQiang.y = mBuJiao.y;
 			addChild(mBuQiang);
 			
+			//不出
+			mBuChu = new MyButton(yellowNormal, "不出", yellowDown, yellowOver);
+			mBuChu.x = 380;
+			mBuChu.y = stage.stageHeight - 200;
+			addChild(mBuChu);
+			
+			//提示
+			mTiShi = new MyButton(greenNormal, "提示", greenDown, greenOver);
+			mTiShi.x = 550;
+			mTiShi.y = stage.stageHeight - 200;
+			addChild(mTiShi);
+			
+			//出牌
+			mChuPai = new MyButton(greenNormal, "出牌", greenDown, greenOver);
+			mChuPai.x = 650;
+			mChuPai.y = stage.stageHeight - 200;
+			addChild(mChuPai);
+			
 			//监听Triggered事件
 			this.addEventListener(Event.TRIGGERED, OnTriggered);
 			
@@ -79,6 +100,9 @@ package game
 			mBuJiao.visible = false;
 			mQiang.visible = false;
 			mBuQiang.visible = false;
+			mBuChu.visible = false;
+			mTiShi.visible = false;
+			mChuPai.visible = false;
 		}
 		
 		//设置叫地主
@@ -97,6 +121,25 @@ package game
 			mBuQiang.visible = true;
 		}
 		
+		//设置出牌操作 参数为true时：第一手牌，或者自己的牌最大，自己必须出牌
+		public function SetPlayCard(bFirst:Boolean):void
+		{
+			Reset();
+			
+			if (bFirst)
+			{
+				mChuPai.visible = true;
+				mChuPai.x = 550;
+			}
+			else
+			{
+				mBuChu.visible = true;
+				mTiShi.visible = true;
+				mChuPai.visible = true;
+				mChuPai.x = 650;
+			}
+		}
+		
 		//Triggered事件监听
 		private function OnTriggered(e:Event):void
 		{
@@ -111,6 +154,10 @@ package game
 					DouDiZhu.sDouDiZhu.QiangDiZhu(0, true);
 				else if (tempButton == mBuQiang)
 					DouDiZhu.sDouDiZhu.QiangDiZhu(0, false);
+				else if (tempButton == mChuPai)
+				{
+					DouDiZhu.sDouDiZhu.OutCard(0, PokerManagerLayer.sPokerManagerLayer.GetUpPokers(), 1);
+				}
 			}
 		}
 	}

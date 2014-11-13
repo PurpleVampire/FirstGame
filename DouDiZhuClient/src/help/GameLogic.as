@@ -23,6 +23,9 @@ package help
 		private var mQiangLogicSeatID:int = GameDefine.INVALID_SEAT_ID;		//抢地主的逻辑座位号
 		private var mLordLogicSeatID:int = GameDefine.INVALID_SEAT_ID;		//地主的逻辑座位号
 		
+		private var mLastWinSeat:int = GameDefine.INVALID_SEAT_ID;	//上一个打牌玩家的座位号（逻辑座位号）
+		private var mLastWinCards:Array = [];						//上一个打牌玩家打的牌
+		
 		private var mTimer:Timer;
 		
 		public function GameLogic() 
@@ -226,6 +229,14 @@ package help
 			//游戏状态--打牌
 			GameData.gGameData.mGameState = GameData.STATE_PLAYCARD;
 			
+			mLordLogicSeatID = lordLogicSeatID;
+			mCurrentLogicSeatID = mLordLogicSeatID;
+			
+			//清空桌面状态
+			OperateStateLayer.sOperateStateLayer.SetState(0, "");
+			OperateStateLayer.sOperateStateLayer.SetState(1, "");
+			OperateStateLayer.sOperateStateLayer.SetState(2, "");
+			
 			//翻开底牌
 			OperateStateLayer.sOperateStateLayer.SetThreePokers(mDiPais);
 			GameData.gGameData.mDiPais = mDiPais.slice(0);
@@ -237,6 +248,47 @@ package help
 			
 			//设置操作时间
 			OperateStateLayer.sOperateStateLayer.SetCountdown(lordLogicSeatID, 20);
+			if (lordLogicSeatID == 0)
+				OperateLayer.sOperateLayer.SetPlayCard(true);
+			else
+			{
+				mTimer.reset();
+				mTimer.start();
+			}
+		}
+		
+		//出牌成功
+		public function OutCardSuccess(outLogicSeatID:int, pokerValues:Array, nextLogicSeatID:int):void
+		{
+			mLastWinSeat = outLogicSeatID;
+			mLastWinCards = pokerValues.slice(0);
+			
+			mCurrentLogicSeatID = nextLogicSeatID;
+			
+			if (outLogicSeatID == 0)	//说明是自己出的牌，要启动机器人打牌
+			{
+				mTimer.reset();
+				mTimer.start();
+			}
+		}
+		
+		//机器人打牌
+		private function RobotPlayCard():void
+		{
+			//暂时定义随便打一张牌
+			var playerData:PlayerData = mPlayerDatas[mCurrentLogicSeatID] as PlayerData;
+			var nextLogicSeatID:int = (mCurrentLogicSeatID + 1) % 3;
+			DouDiZhu.sDouDiZhu.OutCard(mCurrentLogicSeatID, [playerData.mHandPokers[playerData.mHandPokers.length - 1]], nextLogicSeatID);
+			
+			//移除这张牌
+			playerData.mHandPokers.splice(playerData.mHandPokers.length - 1, 1);
+			
+			//如果下一个仍是机器人，启动计时器
+			if (nextLogicSeatID != 0)
+			{
+				mTimer.reset();
+				mTimer.start();
+			}
 		}
 		
 		//定时器操作
@@ -258,6 +310,7 @@ package help
 					QiangDiZhu(bQiang);
 					break;
 				case GameData.STATE_PLAYCARD:
+					RobotPlayCard();
 					break;
 			}
 		}
