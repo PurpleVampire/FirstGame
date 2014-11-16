@@ -147,13 +147,13 @@ package game
 			{
 				var tempButton:MyButton = e.target as MyButton;
 				if (tempButton == mJiao)
-					DouDiZhu.sDouDiZhu.JiaoDiZhu(0, true);
+					DouDiZhu.sDouDiZhu.JiaoDiZhu(0, true, 1);
 				else if (tempButton == mBuJiao)
-					DouDiZhu.sDouDiZhu.JiaoDiZhu(0, false);
+					DouDiZhu.sDouDiZhu.JiaoDiZhu(0, false, 1);
 				else if (tempButton == mQiang)
-					DouDiZhu.sDouDiZhu.QiangDiZhu(0, true);
+					DouDiZhu.sDouDiZhu.QiangDiZhu(0, true, 1);
 				else if (tempButton == mBuQiang)
-					DouDiZhu.sDouDiZhu.QiangDiZhu(0, false);
+					DouDiZhu.sDouDiZhu.QiangDiZhu(0, false, 1);
 				else if (tempButton == mChuPai)
 				{
 					DouDiZhu.sDouDiZhu.OutCard(0, PokerManagerLayer.sPokerManagerLayer.GetUpPokers(), 1);

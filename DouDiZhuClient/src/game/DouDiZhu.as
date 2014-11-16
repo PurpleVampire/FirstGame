@@ -60,8 +60,14 @@ package game
 		}
 		
 		//游戏开始
-		public function GameStart(meHandPokers:Array, rightHandPokers:Array, leftHandPokers:Array):void
+		public function GameStart(selfLogicSeatID:int, meHandPokers:Array, rightHandPokers:Array, leftHandPokers:Array):void
 		{
+			//游戏状态--游戏开始
+			GameData.gGameData.mGameState = GameData.STATE_GAMESTART;
+			
+			//分配玩家的逻辑座位号
+			GameData.gGameData.mSelfLogicSeatID = selfLogicSeatID;
+			
 			//三家手牌数据，目前要测试机器人AI，所以传3个人的数据，后期只传自己的数据，其他人的数据为未知
 			(GameData.gGameData.mPlayerDatas[0] as PlayerData).mHandPokers = meHandPokers.slice(0);
 			(GameData.gGameData.mPlayerDatas[1] as PlayerData).mHandPokers = rightHandPokers.slice(0);
@@ -82,22 +88,115 @@ package game
 				//OperateLayer.sOperateLayer.SetJiao();
 		}
 		
-		//叫地主
-		public function JiaoDiZhu(viewSeatID:int, bJiao:Boolean):void
+		//开始叫地主
+		public function JiaoDiZhuStart(jiaoLogicSeatID:int):void
 		{
-			GameLogic.gGameLogic.JiaoDiZhu(bJiao);
+			//游戏状态--叫地主
+			GameData.gGameData.mGameState = GameData.STATE_JIAO;
 			
-			if(viewSeatID == 0)
+			//当前玩家的操作倒计时
+			var jiaoViewSeatID:int = mGameHelp.GetViewSeatByLogicSeat(jiaoLogicSeatID, GameData.gGameData.mSelfLogicSeatID);
+			OperateStateLayer.sOperateStateLayer.SetCountdown(jiaoViewSeatID, 20);
+			
+			//如果是自己
+			if (jiaoViewSeatID == 0)
+				OperateLayer.sOperateLayer.SetJiao();
+		}
+		
+		//叫地主
+		public function JiaoDiZhu(jiaoLogicSeatID:int, bJiao:Boolean, nextLogicSeatID:int):void
+		{
+			//操作的玩家
+			var jiaoViewSeatID:int = mGameHelp.GetViewSeatByLogicSeat(jiaoLogicSeatID, GameData.gGameData.mSelfLogicSeatID);
+			OperateStateLayer.sOperateStateLayer.SetState(jiaoViewSeatID, (bJiao ? "叫地主" : "不叫"));
+			
+			//下一个玩家的操作
+			var nextViewSeatID:int = mGameHelp.GetViewSeatByLogicSeat(nextLogicSeatID, GameData.gGameData.mSelfLogicSeatID);
+			OperateStateLayer.sOperateStateLayer.SetCountdown(nextViewSeatID, 20);
+			
+			//如果上一个是自己
+			if (jiaoViewSeatID == 0)
 				OperateLayer.sOperateLayer.Reset();
+			
+			//如果下一个是自己
+			if (nextViewSeatID == 0)
+			{
+				if (bJiao)	//别人叫地主，自己只能抢地主
+					QiangDiZhuStart(nextLogicSeatID);
+				else
+					OperateLayer.sOperateLayer.SetJiao();
+			}
+			
+			//刷新逻辑
+			GameLogic.gGameLogic.JiaoDiZhu(jiaoLogicSeatID, bJiao, nextLogicSeatID);
+		}
+		
+		//抢地主开始
+		public function QiangDiZhuStart(qiangLogicSeatID:int):void
+		{
+			//游戏状态--抢地主
+			GameData.gGameData.mGameState = GameData.STATE_QIANG;
+			
+			//当前玩家的操作倒计时
+			var qiangViewSeatID:int = mGameHelp.GetViewSeatByLogicSeat(qiangLogicSeatID, GameData.gGameData.mSelfLogicSeatID);
+			OperateStateLayer.sOperateStateLayer.SetCountdown(qiangViewSeatID, 20);
+			
+			//如果是自己
+			if (qiangViewSeatID == 0)
+				OperateLayer.sOperateLayer.SetQiang();
 		}
 		
 		//抢地主
-		public function QiangDiZhu(viewSeatID:int, bQiang:Boolean):void
+		public function QiangDiZhu(qiangLogicSeatID:int, bQiang:Boolean, nextLogicSeatID:int):void
 		{
-			if (viewSeatID == 0)
+			//操作的玩家
+			var qiangViewSeatID:int = mGameHelp.GetViewSeatByLogicSeat(qiangLogicSeatID, GameData.gGameData.mSelfLogicSeatID);
+			OperateStateLayer.sOperateStateLayer.SetState(qiangViewSeatID, (bQiang ? "抢地主" : "不抢"));
+			
+			//下一个玩家的操作
+			var nextViewSeatID:int = mGameHelp.GetViewSeatByLogicSeat(nextLogicSeatID, GameData.gGameData.mSelfLogicSeatID);
+			OperateStateLayer.sOperateStateLayer.SetCountdown(nextViewSeatID, 20);
+			
+			//如果上一个是自己
+			if (qiangViewSeatID == 0)
 				OperateLayer.sOperateLayer.Reset();
 			
-			GameLogic.gGameLogic.QiangDiZhu(bQiang);
+			//如果下一个是自己
+			if (nextViewSeatID == 0)
+				OperateLayer.sOperateLayer.SetQiang();
+			
+			//刷新逻辑
+			GameLogic.gGameLogic.QiangDiZhu(qiangLogicSeatID, bQiang, nextLogicSeatID);
+		}
+		
+		//抢地主成功
+		public function QiangDiZhuSuccess(lordLogicSeatID:int, diPais:Array):void
+		{
+			//游戏状态--打牌
+			GameData.gGameData.mGameState = GameData.STATE_PLAYCARD;
+			
+			//清空桌面状态
+			OperateStateLayer.sOperateStateLayer.SetState(0, "");
+			OperateStateLayer.sOperateStateLayer.SetState(1, "");
+			OperateStateLayer.sOperateStateLayer.SetState(2, "");
+			
+			//翻开底牌
+			OperateStateLayer.sOperateStateLayer.SetThreePokers(diPais);
+			GameData.gGameData.mDiPais = diPais.slice(0);
+			
+			//地主玩家，手牌添加3张底牌并排序
+			var lordViewSeatID:int = mGameHelp.GetViewSeatByLogicSeat(lordLogicSeatID, GameData.gGameData.mSelfLogicSeatID);
+			(GameData.gGameData.mPlayerDatas[lordViewSeatID] as PlayerData).mHandPokers.push(diPais[0], diPais[1], diPais[2]);
+			PokerHelp.SortByValue((GameData.gGameData.mPlayerDatas[lordViewSeatID] as PlayerData).mHandPokers);
+			PokerManagerLayer.sPokerManagerLayer.InsertPokers(lordViewSeatID, diPais);
+			OperateStateLayer.sOperateStateLayer.SetCountdown(lordViewSeatID, 20);
+			
+			//如果是自己
+			if (lordViewSeatID == 0)
+				OperateLayer.sOperateLayer.SetPlayCard(true);
+			
+			//刷新逻辑
+			GameLogic.gGameLogic.QiangDiZhuSuccess(lordLogicSeatID);
 		}
 		
 		//打牌
@@ -112,6 +211,10 @@ package game
 			var nextViewSeatID:int = mGameHelp.GetViewSeatByLogicSeat(nextLogicSeatID, GameData.gGameData.mSelfLogicSeatID);
 			PokerManagerLayer.sPokerManagerLayer.RemoveOutPokers(nextViewSeatID);
 			OperateStateLayer.sOperateStateLayer.SetCountdown(nextViewSeatID, 20);
+			
+			//如果上一个是自己
+			if (outViewSeatID == 0)
+				OperateLayer.sOperateLayer.Reset();
 			
 			//如果下一个操作的玩家是自己，显示打牌操作
 			if (nextViewSeatID == 0)

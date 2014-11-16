@@ -56,9 +56,6 @@ package help
 		//游戏开始
 		public function GameStart():void
 		{
-			//分配玩家的逻辑座位号
-			GameData.gGameData.mSelfLogicSeatID = 0;
-			
 			//洗牌
 			var pokerValues:Array = PokerHelp.Shuffle();
 			
@@ -73,184 +70,93 @@ package help
 			PokerHelp.SortByValue((mPlayerDatas[1] as PlayerData).mHandPokers);
 			PokerHelp.SortByValue((mPlayerDatas[2] as PlayerData).mHandPokers);
 			
-			//游戏状态--游戏开始
-			GameData.gGameData.mGameState = GameData.STATE_GAMESTART;
-			
 			//设置定时器
 			mTimer.delay = 3.5 * 1000;
 			mTimer.reset();
 			mTimer.start();
 			
 			//更新界面
-			DouDiZhu.sDouDiZhu.GameStart(mPlayerDatas[0].mHandPokers, mPlayerDatas[1].mHandPokers, mPlayerDatas[2].mHandPokers);
+			DouDiZhu.sDouDiZhu.GameStart(0, mPlayerDatas[0].mHandPokers, mPlayerDatas[1].mHandPokers, mPlayerDatas[2].mHandPokers);
 			OperateStateLayer.sOperateStateLayer.SetThreePokers([0x00, 0x00, 0x00]);
 		}
 		
-		//开始叫地主
-		public function JiaoDiZhuStart():void
-		{
-			//游戏状态--叫地主
-			GameData.gGameData.mGameState = GameData.STATE_JIAO;
-			
-			//随机一个玩家叫地主
-			mStartLogicSeatID = (int(Math.random() * 10)) % 3;
-			mCurrentLogicSeatID = mStartLogicSeatID;
-			
-			OperateStateLayer.sOperateStateLayer.SetCountdown(mCurrentLogicSeatID, 20);
-			if (mCurrentLogicSeatID == 0)
-				OperateLayer.sOperateLayer.SetJiao();
-			else
-			{
-				mTimer.delay = 3 * 1000;
-				mTimer.reset();
-				mTimer.start();
-			}
-		}
-		
-		//叫地主操作
-		public function JiaoDiZhu(bJiao:Boolean):void
+		//叫地主
+		public function JiaoDiZhu(jiaoLogicSeatID:int, bJiao:Boolean, nextLogicSeatID:int):void
 		{
 			if (bJiao)
 			{
-				OperateStateLayer.sOperateStateLayer.SetState(mCurrentLogicSeatID, "叫地主");
-				
 				//叫地主的玩家逻辑座位号
-				mJiaoLogicSeatID = mCurrentLogicSeatID;
-				
+				mJiaoLogicSeatID = jiaoLogicSeatID;
 				QiangDiZhuStart();
 			}
 			else
 			{
-				OperateStateLayer.sOperateStateLayer.SetState(mCurrentLogicSeatID, "不叫");
-				
-				mCurrentLogicSeatID = (mCurrentLogicSeatID + 1) % 3;
-				
-				if (mCurrentLogicSeatID == mStartLogicSeatID && mJiaoLogicSeatID == GameDefine.INVALID_SEAT_ID)
+				mCurrentLogicSeatID = nextLogicSeatID;
+				if (nextLogicSeatID == mStartLogicSeatID && mJiaoLogicSeatID == GameDefine.INVALID_SEAT_ID)
 				{
 					//游戏结束--没人叫地主
 				}
 				else
 				{
-					OperateStateLayer.sOperateStateLayer.SetCountdown(mCurrentLogicSeatID, 20);
-					OperateStateLayer.sOperateStateLayer.SetState(mCurrentLogicSeatID, "");
-					if (mCurrentLogicSeatID == 0)
-						OperateLayer.sOperateLayer.SetJiao();
-					else
+					//是否需要启动机器人
+					if(nextLogicSeatID != 0)
 					{
 						mTimer.reset();
 						mTimer.start();
 					}
 				}
-			}
-		}
-		
-		//抢地主开始
-		public function QiangDiZhuStart():void
-		{
-			//游戏状态--抢地主
-			GameData.gGameData.mGameState = GameData.STATE_QIANG;
-			
-			//抢地主玩家的座位号
-			mCurrentLogicSeatID = (mJiaoLogicSeatID + 1) % 3;
-			OperateStateLayer.sOperateStateLayer.SetCountdown(mCurrentLogicSeatID, 20);
-			if (mCurrentLogicSeatID == 0)
-				OperateLayer.sOperateLayer.SetQiang();
-			else
-			{
-				mTimer.reset();
-				mTimer.start();
 			}
 		}
 		
 		//抢地主
-		public function QiangDiZhu(bQiang:Boolean):void
+		public function QiangDiZhu(qiangLogicSeatID:int, bQiang:Boolean, nextLogicSeatID:int):void
 		{
-			if (mCurrentLogicSeatID == mJiaoLogicSeatID && bQiang)	//叫地主的玩家也抢地主
-			{
-				//抢地主成功
-				OperateStateLayer.sOperateStateLayer.SetState(mCurrentLogicSeatID, "抢地主");
-				QiangDiZhuSuccess(mJiaoLogicSeatID);
-				return;
-			}
-			else if (mCurrentLogicSeatID == mJiaoLogicSeatID && !bQiang)	//最后一个抢地主的为地主
-			{
-				//抢地主成功
-				OperateStateLayer.sOperateStateLayer.SetState(mCurrentLogicSeatID, "不抢");
-				QiangDiZhuSuccess(mQiangLogicSeatID);
-				return;
-			}
-			
 			if (bQiang)
 			{
-				OperateStateLayer.sOperateStateLayer.SetState(mCurrentLogicSeatID, "抢地主");
+				mQiangLogicSeatID = qiangLogicSeatID;
+				mCurrentLogicSeatID = nextLogicSeatID;
 				
-				mQiangLogicSeatID = mCurrentLogicSeatID;
-				
-				mCurrentLogicSeatID = (mCurrentLogicSeatID + 1) % 3;
-				OperateStateLayer.sOperateStateLayer.SetCountdown(mCurrentLogicSeatID, 20);
-				OperateStateLayer.sOperateStateLayer.SetState(mCurrentLogicSeatID, "");
-				if (mCurrentLogicSeatID == 0)
-					OperateLayer.sOperateLayer.SetQiang();
+				//叫地主的玩家也抢了地主
+				if (qiangLogicSeatID == mJiaoLogicSeatID)	
+					DouDiZhu.sDouDiZhu.QiangDiZhuSuccess(mJiaoLogicSeatID, mDiPais);
 				else
 				{
-					mTimer.reset();
-					mTimer.start();
-				}
-			}
-			else
-			{
-				OperateStateLayer.sOperateStateLayer.SetState(mCurrentLogicSeatID, "不抢");
-				
-				mCurrentLogicSeatID = (mCurrentLogicSeatID + 1) % 3;
-				
-				if (mCurrentLogicSeatID == mJiaoLogicSeatID && mQiangLogicSeatID == GameDefine.INVALID_SEAT_ID)	//没人抢地主，地主是叫地主的那个玩家
-				{
-					//抢地主成功
-					QiangDiZhuSuccess(mJiaoLogicSeatID);
-				}
-				else
-				{
-					OperateStateLayer.sOperateStateLayer.SetCountdown(mCurrentLogicSeatID, 20);
-					OperateStateLayer.sOperateStateLayer.SetState(mCurrentLogicSeatID, "");
-					if (mCurrentLogicSeatID == 0)
-						OperateLayer.sOperateLayer.SetQiang();
-					else
+					//是否需要启动机器人
+					if (nextLogicSeatID != 0)
 					{
 						mTimer.reset();
 						mTimer.start();
 					}
-				}				
+				}
+			}
+			else
+			{
+				mCurrentLogicSeatID = nextLogicSeatID;
+				//到叫地主的玩家之前，大家都没抢，则叫地主的成功
+				if (nextLogicSeatID == mJiaoLogicSeatID && mQiangLogicSeatID == GameDefine.INVALID_SEAT_ID)
+					DouDiZhu.sDouDiZhu.QiangDiZhuSuccess(mJiaoLogicSeatID, mDiPais);
+				else if (qiangLogicSeatID == mJiaoLogicSeatID)	//叫地主的玩家没抢，则地主给最后抢的那个人
+					DouDiZhu.sDouDiZhu.QiangDiZhuSuccess(mQiangLogicSeatID, mDiPais);
+				else
+				{
+					//是否需要启动机器人
+					if(nextLogicSeatID != 0)
+					{
+						mTimer.reset();
+						mTimer.start();
+					}
+				}
 			}
 		}
 		
 		//抢地主成功
 		public function QiangDiZhuSuccess(lordLogicSeatID:int):void
 		{
-			//游戏状态--打牌
-			GameData.gGameData.mGameState = GameData.STATE_PLAYCARD;
-			
 			mLordLogicSeatID = lordLogicSeatID;
 			mCurrentLogicSeatID = mLordLogicSeatID;
 			
-			//清空桌面状态
-			OperateStateLayer.sOperateStateLayer.SetState(0, "");
-			OperateStateLayer.sOperateStateLayer.SetState(1, "");
-			OperateStateLayer.sOperateStateLayer.SetState(2, "");
-			
-			//翻开底牌
-			OperateStateLayer.sOperateStateLayer.SetThreePokers(mDiPais);
-			GameData.gGameData.mDiPais = mDiPais.slice(0);
-			
-			//手牌添加3张底牌并排序
-			(GameData.gGameData.mPlayerDatas[lordLogicSeatID] as PlayerData).mHandPokers.push(mDiPais[0], mDiPais[1], mDiPais[2]);
-			PokerHelp.SortByValue((GameData.gGameData.mPlayerDatas[lordLogicSeatID] as PlayerData).mHandPokers);
-			PokerManagerLayer.sPokerManagerLayer.InsertPokers(lordLogicSeatID, mDiPais);
-			
-			//设置操作时间
-			OperateStateLayer.sOperateStateLayer.SetCountdown(lordLogicSeatID, 20);
-			if (lordLogicSeatID == 0)
-				OperateLayer.sOperateLayer.SetPlayCard(true);
-			else
+			//是否需要启动机器人
+			if (lordLogicSeatID != 0)
 			{
 				mTimer.reset();
 				mTimer.start();
@@ -270,6 +176,58 @@ package help
 				mTimer.reset();
 				mTimer.start();
 			}
+		}
+		
+		//开始叫地主
+		public function JiaoDiZhuStart():void
+		{
+			//随机一个玩家叫地主
+			mStartLogicSeatID = (int(Math.random() * 10)) % 3;
+			mCurrentLogicSeatID = mStartLogicSeatID;
+			
+			//更新界面
+			DouDiZhu.sDouDiZhu.JiaoDiZhuStart(mCurrentLogicSeatID);
+			
+			//是否要启动机器人
+			if(mCurrentLogicSeatID != 0)
+			{
+				mTimer.delay = 3 * 1000;
+				mTimer.reset();
+				mTimer.start();
+			}
+		}
+		
+		//抢地主开始
+		public function QiangDiZhuStart():void
+		{
+			//抢地主玩家的座位号
+			mCurrentLogicSeatID = (mJiaoLogicSeatID + 1) % 3;
+			
+			//更新界面
+			DouDiZhu.sDouDiZhu.QiangDiZhuStart(mCurrentLogicSeatID);
+			
+			//是否需要启动机器人
+			if(mCurrentLogicSeatID != 0)
+			{
+				mTimer.reset();
+				mTimer.start();
+			}
+		}
+		
+		//机器人叫地主操作
+		public function RobotJiaoDiZhu():void
+		{
+			var bJiao:Boolean = Boolean((int(Math.random() * 10)) % 2);
+			var nextLogicSeatID:int = (mCurrentLogicSeatID + 1) % 3;
+			DouDiZhu.sDouDiZhu.JiaoDiZhu(mCurrentLogicSeatID, bJiao, nextLogicSeatID);
+		}
+		
+		//机器人抢地主操作
+		public function RobotQiangDiZhu():void
+		{
+			var bQiang:Boolean = Boolean((int(Math.random() * 10)) % 2);
+			var nextLogicSeatID:int = (mCurrentLogicSeatID + 1) % 3;
+			DouDiZhu.sDouDiZhu.QiangDiZhu(mCurrentLogicSeatID, bQiang, nextLogicSeatID);
 		}
 		
 		//机器人打牌
@@ -302,12 +260,10 @@ package help
 					JiaoDiZhuStart();
 					break;
 				case GameData.STATE_JIAO:
-					var bJiao:Boolean = Boolean((int(Math.random() * 10)) % 2);
-					JiaoDiZhu(bJiao);
+					RobotJiaoDiZhu();
 					break;
 				case GameData.STATE_QIANG:
-					var bQiang:Boolean = Boolean((int(Math.random() * 10)) % 2);
-					QiangDiZhu(bQiang);
+					RobotQiangDiZhu();
 					break;
 				case GameData.STATE_PLAYCARD:
 					RobotPlayCard();
