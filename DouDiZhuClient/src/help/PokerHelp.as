@@ -82,6 +82,125 @@ package help
 			}
 		}
 		
+		//按照牌值相同的牌的数量排序
+		public static function SortByCount(pokerValues:Array):Array
+		{
+			var pokers:Array = [];
+			
+			//先分别获取
+			var oneCards:Array = GetCardsWithNumber(pokerValues, 1);
+			var twoCards:Array = GetCardsWithNumber(pokerValues, 2);
+			var threeCards:Array = GetCardsWithNumber(pokerValues, 3);
+			var fourCards:Array = GetCardsWithNumber(pokerValues, 4);
+			
+			//赋值
+			pokers = pokers.concat(fourCards.slice(0));
+			pokers = pokers.concat(threeCards.slice(0));
+			pokers = pokers.concat(twoCards.slice(0));
+			pokers = pokers.concat(oneCards.slice(0));
+			
+			return pokers;
+		}
+		
+		//得到所给的牌中数量为number的所有牌（该函数返回的是准确数量，比如要2张的，如果有3个3，则不取3的值，因为3有3张）
+		public static function GetCardsWithNumber(pokerValues:Array, number:int):Array
+		{
+			var pokers:Array = [];
+			
+			//先进行牌值排序
+			SortByValue(pokerValues);
+			
+			//开始查找
+			var pokerValue1:int, pokerValue2:int, frontPokerValue:int, backPokerValue:int;
+			for (var i:int = 0; i < pokerValues.length - number + 1; )
+			{
+				if (i == 0)	//第一轮查找，不用判断前一张扑克牌	
+				{
+					pokerValue1 = pokerValues[i] >> 4;
+					pokerValue2 = pokerValues[i + number - 1] >> 4;
+					backPokerValue = pokerValues[i + number] >> 4;
+					if (pokerValue1 == pokerValue2 && pokerValue1 != backPokerValue)
+					{
+						pokers = pokers.concat(pokerValues.slice(i, i + number));
+						i += number;
+					}
+					else
+						i++;
+				}
+				else if ((i + number) == pokerValues.length)//查找的最后一轮，不用判断后一张扑克牌
+				{
+					pokerValue1 = pokerValues[i] >> 4;
+					pokerValue2 = pokerValues[i + number - 1] >> 4;
+					frontPokerValue = pokerValues[i - 1] >> 4;
+					if (pokerValue1 == pokerValue2 && pokerValue1 != frontPokerValue)
+					{
+						pokers = pokers.concat(pokerValues.slice(i, i+number));
+						i += number
+					}	
+					else
+						i++;
+				}
+				else
+				{
+					pokerValue1 = pokerValues[i] >> 4;
+					pokerValue2 = pokerValues[i + number - 1] >> 4;
+					frontPokerValue = pokerValues[i - 1] >> 4;
+					backPokerValue = pokerValues[i + number] >> 4;
+					if (pokerValue1 == pokerValue2 && pokerValue1 != frontPokerValue && pokerValue1 != backPokerValue)
+					{
+						pokers = pokers.concat(pokerValues.slice(i, i + number));
+						i += number;
+					}
+					else
+						i++;
+				}
+			}
+			
+			return pokers;
+		}
+		
+		//将所给的牌中取出能够满足数量要求的所有牌（该函数返回的是满足数量的，比如要2张的，如果有3个3，则取从小到大拿2张3）
+		public function GetNumberCardFromCards(pokerValues:Array, number:int):Array
+		{
+			var pokers:Array = [];
+			
+			//先进行数量排序
+			pokerValues = SortByCount(pokerValues);
+			
+			//开始查找
+			var pokerValue1:int, pokerValue2:int, frontPokerValue:int;
+			for (var i:int = pokerValues.length - 1; i >= number - 1; )
+			{
+				if (i == (pokerValues.length - 1))
+				{
+					pokerValue1 = pokerValues[i] >> 4;
+					pokerValue2 = pokerValues[i - number + 1] >> 4; 
+					if (pokerValue1 == pokerValue2)
+					{
+						pokers = pokers.concat(pokerValues.slice(i - number + 1, i + 1));
+						i -= number;
+					}
+					else
+						i--;
+				}
+				else
+				{
+					pokerValue1 = pokerValues[i] >> 4;
+					pokerValue2 = pokerValues[i - number + 1] >> 4;
+					frontPokerValue = pokerValues[i + 1] >> 4;
+					if (pokerValue1 == pokerValue2 && pokerValue1 != frontPokerValue)
+					{
+						pokers = pokers.concat(pokerValues.slice(i - number + 1, i + 1));
+						i -= number;
+					}
+					else
+						i--;
+				}
+			}
+			
+			return pokers;
+		}
+		
 		//看是否可以出这手牌
 		public function CanOutCard(lastWinCards:Array, outCards:Array):Boolean
 		{
@@ -209,75 +328,11 @@ package help
 			return cardType;
 		}
 		
-		//得到所给的牌中数量为number的所有牌
-		public function getCardsWithNumber(pokerValues:Array, number:int):Array
-		{
-			var num1:Array = [];
-			var num2:Array = [];
-			var num3:Array = [];
-			var num4:Array = [];
-			
-			//先进行牌值排序
-			SortByValue(pokerValues);
-			
-			//将对应数量的牌放入对应的数组
-			var shuliang:int = 1;
-			for (var m:int = 0; m < pokerValues.length;)
-			{
-				var paizhi1:int = pokerValues[m] >> 4;
-				var paizhi2:int = pokerValues[m + shuliang] >> 4;
-				if (paizhi1 != paizhi2)
-				{
-					switch(shuliang)
-					{
-						case 1:
-							num1.push(pokerValues[m]);
-							break;
-						case 2:
-							num2.push(pokerValues[m]);
-							num2.push(pokerValues[m+1]);
-							break;
-						case 3:
-							num3.push(pokerValues[m]);
-							num3.push(pokerValues[m+1]);
-							num3.push(pokerValues[m+2]);
-							break;
-						case 4:
-							num4.push(pokerValues[m]);
-							num4.push(pokerValues[m+1]);
-							num4.push(pokerValues[m+2]);
-							num4.push(pokerValues[m+3]);
-							break;
-					}
-					m += shuliang;
-					shuliang = 1;	
-				}
-				else 
-				{
-					shuliang++;
-				}
-			}
-			
-			switch(number)
-			{
-				case 1:
-					return num1;
-				case 2:
-					return num2;
-				case 3:
-					return num3;
-				case 4:
-					return num4;
-			}
-			
-			return null;
-		}
-		
 		//是否是3带1
 		public function Is3Dai1(pokerValues:Array):Boolean
 		{
 			var pokers3:Array = [];
-			pokers3 = getCardsWithNumber(pokerValues, 3);
+			pokers3 = GetCardsWithNumber(pokerValues, 3);
 			
 			return (pokers3.length == 0) ? false :true;
 		}
@@ -286,10 +341,10 @@ package help
 		public function Is3Dai2(pokerValues:Array):Boolean
 		{
 			var pokers3:Array = [];
-			pokers3 = getCardsWithNumber(pokerValues, 3);
+			pokers3 = GetCardsWithNumber(pokerValues, 3);
 			
 			var pokers2:Array = [];
-			pokers2 = getCardsWithNumber(pokerValues, 2);
+			pokers2 = GetCardsWithNumber(pokerValues, 2);
 			
 			return (pokers3.length == 0 || pokers2.length == 0) ? false : true;
 		}
@@ -298,7 +353,7 @@ package help
 		public function Is4Dai1(pokerValues:Array):Boolean
 		{
 			var pokers4:Array = [];
-			pokers4 = getCardsWithNumber(pokerValues, 4);
+			pokers4 = GetCardsWithNumber(pokerValues, 4);
 			
 			return (pokers4.length == 0) ? false : true;
 		}
@@ -307,10 +362,10 @@ package help
 		public function Is4Dai2(pokerValues:Array):Boolean
 		{
 			var pokers4:Array = [];
-			pokers4 = getCardsWithNumber(pokerValues, 4);
+			pokers4 = GetCardsWithNumber(pokerValues, 4);
 			
 			var pokers2:Array = [];
-			pokers2 = getCardsWithNumber(pokerValues, 2);
+			pokers2 = GetCardsWithNumber(pokerValues, 2);
 			
 			return (pokers4.length == 0 || pokers2.length == 0) ? false : true;
 		}
@@ -319,10 +374,10 @@ package help
 		public function Is4DaiTwoSingle(pokerValues:Array):Boolean
 		{
 			var pokers4:Array = [];
-			pokers4 = getCardsWithNumber(pokerValues, 4);
+			pokers4 = GetCardsWithNumber(pokerValues, 4);
 			
 			var pokers1:Array = [];
-			pokers1 = getCardsWithNumber(pokerValues, 1);
+			pokers1 = GetCardsWithNumber(pokerValues, 1);
 			
 			return (pokers4.length == 0 || pokers1.length != 2) ? false : true;
 		}
@@ -331,7 +386,7 @@ package help
 		public function IsPlane1(pokerValues:Array):Boolean
 		{
 			var pokers3:Array = [];
-			pokers3 = getCardsWithNumber(pokerValues, 3);
+			pokers3 = GetCardsWithNumber(pokerValues, 3);
 			
 			//几对3张的
 			var count:int = pokers3.length / 3;
@@ -354,10 +409,10 @@ package help
 		public function IsPlane2(pokerValues:Array):Boolean
 		{
 			var pokers3:Array = [];
-			pokers3 = getCardsWithNumber(pokerValues, 3);
+			pokers3 = GetCardsWithNumber(pokerValues, 3);
 			
 			var pokers2:Array = [];
-			pokers2 = getCardsWithNumber(pokerValues, 2);
+			pokers2 = GetCardsWithNumber(pokerValues, 2);
 			
 			//几对3张，几对2张
 			var count3:int = pokers3.length / 3;
@@ -414,290 +469,130 @@ package help
 			return true;
 		}
 		
+		//得到火箭
+		public function GetRocket(pokerValues:Array):Array
+		{
+			var rocket:Array = [];
+			
+			//从大到小排序
+			SortByValue(pokerValues);
+			
+			//判断最大的两个是不是大小王即可，是赋值，不是不赋值
+			if (pokerValues[0] == 0xf5 && pokerValues[1] == 0xe5)
+			{
+				rocket.push(pokerValues[0]);
+				rocket.push(pokerValues[1]);
+			}
+			
+			return rocket;
+		}
+		
 		//提示出牌
 		public function TiShiOutCard(handCards:Array, handCardCount:int, lastWinCards:Array, lastWinCardCount:int, tiShiCards:Array, tiShiCardCount:int):int
 		{
 			var nRet:int = -1;
 			
-			//var lastWinCardType:int = getCardType(lastWinCards);		//上一个玩家出的牌的类型
-			//var lastWinCardValue:int = getCardValue(lastWinCards[0]);	//上一个玩家出的牌的最大牌的牌值 替换 var lastWinCardValue:int = lastWinCard[0] >> 4;		
-			//
-			//var tiShiCardType:int = 0;
-			//var tiShiCardValue:int = 0;
-			//if (tiShiCardCount)
-			//{
-				//tiShiCardType = getCardType(tiShiCards);		//当前弹起的牌的类型
-				//tiShiCardValue = getCardNormalValue(tiShiCards[0]);//当前弹起的牌的普通值//当前弹起的牌的最大牌的牌值 替换 tiShiCardValue =  tiShiCard[0] >> 4;	
-			//}
-			//
-			//var lastTiShiCard:int = tiShiCards[0];		//上一次提示的牌的最大牌
-			//var lastTiShiCardValue:int = tiShiCardValue;//上一次提示的牌的最大牌的牌值
-			//
-			////查找符合条件的牌
-			//{
-				////清空提示出牌的数组
-				//for (var i:int = 0; i < tiShiCards.length; )
-				//{
-					//tiShiCards.splice(0, 1);
-				//}
-				//
-				//var oneCardArray0:Array = new Array();				//1张牌的数组
-				//oneCardArray0 = getCardsWithNumber(handCards, 1);
-					//
-				//var twoCardArray0:Array = new Array();				//2张牌的数组
-				//twoCardArray0 = getCardsWithNumber(handCards, 2);
-					//
-				//var threeCardArray0:Array = new Array();			//3张牌的数组
-				//threeCardArray0 = getCardsWithNumber(handCards, 3);
-					//
-				//var fourCardArray0:Array = new Array();				//4张牌的数组
-				//fourCardArray0 = getCardsWithNumber(handCards, 4);
-						//
-				//var doubleRedTenArray0:Array = new Array();			//双红十
-				//doubleRedTenArray0 = GetDoubleRed10(handCards);
-					//
-				//var bFind:Boolean = false;
-					//
-				//if (lastWinCardType == CARD_ONE)//单牌
-				//{
-					//if (tiShiCardType == CARD_ERROR || tiShiCardType == CARD_RED10 || (m_FindSwitch == 1 && tiShiCardCount > 1))
-					//{
-						//lastTiShiCardValue = 0;
-						//tiShiCardCount = 0;
-					//}
-					//
-					////首先找单牌
-					//if (m_FindSwitch == 1)
-					//{
-						//if (oneCardArray0.length > 0)
-						//{
-							//for (var m0:int = (oneCardArray0.length - 1); m0 >= 0; m0--)
-							//{
-								////红十单独处理
-								//if (oneCardArray0[m0] == 0x81 || oneCardArray0[m0] == 0x83)
-									//break;
-								//
-								//if ((getCardValue(oneCardArray0[m0]) > lastWinCardValue) && (getCardValue(oneCardArray0[m0]) > lastTiShiCardValue))
-								//{
-									//bFind = true;
-									//tiShiCardCount = 1;
-									//tiShiCards.push(oneCardArray0[m0]);
-									//break;
-								//}
-							//}
-						//}
-						//
-						//if (!bFind)
-						//{
-							////清掉lastTiShiCardValue的记录
-							//lastTiShiCardValue = 0;
-							//m_FindSwitch = 2;
-						//}
-					//}
-					//
-					////找对子
-					//if (m_FindSwitch == 2)
-					//{
-						//if (!bFind && twoCardArray0.length > 0)
-						//{
-							//var temp0:int = 0;
-							//for (var n0:int = (twoCardArray0.length -1); n0 >= 0; n0--)
-							//{
-								////红十单独处理
-								//if (twoCardArray0[n0] == 0x81 || twoCardArray0[n0] == 0x83)
-									//break;
-								//
-								//if (temp0 == getCardValue(twoCardArray0[n0]))
-									//continue;
-								//else
-									//temp0 = getCardValue(twoCardArray0[n0]);
-								//
-								//if ((getCardValue(twoCardArray0[n0]) > lastWinCardValue) && (getCardValue(twoCardArray0[n0]) > lastTiShiCardValue))
-								//{
-									//bFind = true;
-									//tiShiCardCount = 1;
-									//tiShiCards.push(twoCardArray0[n0]);
-									//break;
-								//}
-							//}
-						//}
-						//
-						//if (!bFind)
-						//{
-							////清掉lastTiShiCardValue的记录
-							//lastTiShiCardValue = 0;
-							//m_FindSwitch = 3;
-						//}
-					//}
-					//
-					////找3张
-					//if (m_FindSwitch == 3)
-					//{
-						//if (!bFind && threeCardArray0.length > 0)
-						//{
-							//var temp1:int = 0;
-							//for (var i0:int = (threeCardArray0.length - 1); i0 >= 0; i0--)
-							//{
-								////红十单独处理
-								//if (threeCardArray0[i0] == 0x81 || threeCardArray0[i0] == 0x83)
-									//break;
-								//
-								//if (temp1 == getCardValue(threeCardArray0[i0]))
-									//continue;
-								//else
-									//temp1 = getCardValue(threeCardArray0[i0]);
-								//
-								//if ((getCardValue(threeCardArray0[i0]) > lastWinCardValue) && (getCardValue(threeCardArray0[i0]) > lastTiShiCardValue))
-								//{
-									//bFind = true;
-									//tiShiCardCount = 1;
-									//tiShiCards.push(threeCardArray0[i0]);
-									//break;
-								//}
-							//}
-						//}
-						//
-						//if (!bFind)
-						//{
-							////清掉lastTiShiCardValue的记录
-							//lastTiShiCardValue = 0;
-							//m_FindSwitch = 4;
-						//}
-					//}
-					//
-					////找4张
-					//if (m_FindSwitch == 4)
-					//{
-						//if (!bFind && fourCardArray0.length > 0)
-						//{
-							//var temp2:int = 0;
-							//for (var j0:int = (fourCardArray0.length - 1); j0 >= 0; j0--)
-							//{
-								////红十单独处理
-								//if (fourCardArray0[j0] == 0x81 || fourCardArray0[j0] == 0x83)
-									//break;
-								//
-								//if (temp2 == getCardValue(fourCardArray0[j0]))
-									//continue;
-								//else
-									//temp2 == getCardValue(fourCardArray0[j0]);
-								//
-								//if ((getCardValue(fourCardArray0[j0]) > lastWinCardValue) && (getCardValue(fourCardArray0[j0]) > lastTiShiCardValue))
-								//{
-									//bFind = true;
-									//tiShiCardCount = 1;
-									//tiShiCards.push(fourCardArray0[j0]);
-									//break;
-								//}
-							//}
-						//}
-						//
-						//if (!bFind)
-						//{
-							////清掉lastTiShiCardValue的记录
-							//lastTiShiCardValue = 0;
-							//m_FindSwitch = 5;
-						//}
-					//}
-					//
-					////单独处理的红十
-					//if (m_FindSwitch == 5)
-					//{
-						//if (!bFind)
-						//{
-							//for (var index:int = 0; index < handCards.length; index++)
-							//{
-								//if (handCards[index] == 0x81 || handCards[index] == 0x83)//是红十
-								//{
-									//if (lastTiShiCard == 0x81 || lastTiShiCard == 0x83)//上一个提示的牌也是红十
-										//break;
-										//
-									//bFind = true;
-									//tiShiCards.push(handCards[index]);
-									//break;
-								//}
-							//}
-						//}
-						//
-						//if (!bFind)
-						//{
-							////清掉lastTiShiCardValue的记录
-							//lastTiShiCardValue = 0;
-							//m_FindSwitch = 6;
-						//}
-					//}
-					//
-					////找3个的炸弹
-					//if (m_FindSwitch == 6)
-					//{
-						//if (!bFind && threeCardArray0.length > 0)
-						//{
-							//for (var k0:int = (threeCardArray0.length -1); k0 >= 0; k0 -= 3)
-							//{
-								//if (getCardNormalValue(threeCardArray0[k0]) <= lastTiShiCardValue)//3个时不区分红十，取普通值
-									//continue;
-								//
-								//bFind = true;
-								//tiShiCards.push(threeCardArray0[k0 - 2]);
-								//tiShiCards.push(threeCardArray0[k0 - 1]);
-								//tiShiCards.push(threeCardArray0[k0]);
-								//break;
-							//}
-						//}	
-						//
-						//if (!bFind)
-						//{
-							////清掉lastTiShiCardValue的记录
-							//lastTiShiCardValue = 0;
-							//m_FindSwitch = 7;
-						//}
-					//}
-					//
-					////找4个的炸弹
-					//if (m_FindSwitch == 7)
-					//{
-						//if (!bFind && fourCardArray0.length > 0)
-						//{
-							//for (var g0:int = (fourCardArray0.length - 1); g0 >= 0; g0 -= 4)
-							//{
-								//if (getCardNormalValue(fourCardArray0[g0]) <= lastTiShiCardValue)//4个时不区分红十，取普通值
-									//continue;
-									//
-								//bFind = true;
-								//tiShiCards.push(fourCardArray0[g0 - 3]);
-								//tiShiCards.push(fourCardArray0[g0 - 2]);
-								//tiShiCards.push(fourCardArray0[g0 - 1]);
-								//tiShiCards.push(fourCardArray0[g0]);
-								//break;
-							//}
-						//}
-						//
-						//if (!bFind)
-						//{
-							////清掉lastTiShiCardValue的记录
-							//lastTiShiCardValue = 0;
-							//m_FindSwitch = 8;
-						//}
-					//}
-					//
-					////找双红十
-					//if (m_FindSwitch == 8)
-					//{
-						//if (!bFind && doubleRedTenArray0.length > 0)
-						//{
-							//bFind = true;
-							//tiShiCards.push(doubleRedTenArray0[0]);
-							//tiShiCards.push(doubleRedTenArray0[1]);	
-						//}
-						//
-						////清掉lastTiShiCardValue的记录
-						//lastTiShiCardValue = 0;
-						//m_FindSwitch = 1;
-					//}
-					//
-					//if (bFind)
-						//nRet = 1;
-				//}
+			//上一个出牌的玩家出的牌的类型和最大的牌值
+			var lastWinCardType:int = GetCardType(lastWinCards);
+			var lastWinCardValue:int = lastWinCards[0] >> 4;	
+			
+			//当前提示的牌的类型和最大的牌值
+			var tiShiCardType:int = 0;
+			var tiShiCardValue:int = 0;
+			var tiShiCard:Number = 0x00;
+			if (tiShiCardCount)
+			{
+				tiShiCardType = GetCardType(tiShiCards);
+				tiShiCardValue = tiShiCards[0] >> 4;
+				tiShiCard = tiShiCards[0];
+			}
+			
+			//清空提示出牌的数组
+			tiShiCards.splice(0);
+			
+			//查找符合条件的牌
+			{		
+				var findSwitch:int = 0;
+				var index:int = 0;
+				var oneNumberCards:Array = [];
+				var twoNumberCards:Array = [];
+				var threeNumberCards:Array = [];
+				var fourNumberCards:Array = [];
+				var rocket:Array = [];
+				
+				if (lastWinCardType == CARD_ONE)//单牌
+				{
+					//先根据数量排序后，都取出一张牌
+					oneNumberCards = GetNumberCardFromCards(handCards, 1);
+					
+					//如果是第一次找或者已经提示过炸弹和火箭了，则从头开始
+					if (tiShiCardCount == 0 || tiShiCardType == CARD_FOUR || tiShiCardType == CARD_ROCKET)
+					{
+						for (var m0:int = 0; m0 < oneNumberCards.length; m0++)
+						{
+							if ((oneNumberCards[m0] >> 4) > lastWinCardValue)
+							{
+								nRet = 1;
+								tiShiCardCount = 1;
+								tiShiCards.push(oneNumberCards[m0]);
+								break;
+							}
+						}
+					}
+					
+					//如果不是第一次找，并且数量是一个，说明从单张的里面找
+					if (tiShiCardCount == 1)
+					{
+						index = oneNumberCards.indexOf(tiShiCard);
+						//如果已经提示到最后一张牌，则只能找炸弹
+						if (index == (oneNumberCards.length - 1))
+							findSwitch = 1;
+						else
+						{
+							nRet = 1;
+							tiShiCardCount = 1;
+							tiShiCards.push(oneNumberCards[index + 1]);
+						}
+					}
+					
+					//找4个的炸弹
+					if (findSwitch == 1)
+					{
+						fourNumberCards = GetNumberCardFromCards(handCards, 4);
+						if (fourNumberCards.length > 0)
+						{
+							index = fourNumberCards.indexOf(tiShiCard);
+							
+							//如果是第一次查找炸弹或没有查找到
+							if (tiShiCardCount != 4 || index == -1)
+								index = 0;
+							
+							//如果已经提示到最后一张牌，则只能找炸弹
+							if (index == (oneNumberCards.length - 1))
+								findSwitch = 2;
+							else
+							{
+								nRet = 1;
+								tiShiCards.push(fourNumberCards[index + 1]);
+								tiShiCards.push(fourNumberCards[index + 2]);
+								tiShiCards.push(fourNumberCards[index + 3]);
+								tiShiCards.push(fourNumberCards[index + 4]);
+							}
+						}
+					}
+					
+					//找火箭
+					if (findSwitch == 2)
+					{
+						rocket = GetRocket(handCards);
+						if (rocket.length == 2)
+						{
+							nRet = 1;
+							tiShiCards.push(rocket[1]);	//先赋值小王
+							tiShiCards.push(rocket[0]);	//再复制大王
+						}
+					}
+				}
 				//else if (lastWinCardType == CARD_TWO)//对子
 				//{
 					//if (tiShiCardType == CARD_ERROR || tiShiCardType == CARD_RED10 || (m_FindSwitch == 1 && tiShiCardCount > 2))
@@ -709,15 +604,15 @@ package help
 					////首先找对子
 					//if (m_FindSwitch == 1)
 					//{
-						//if (twoCardArray0.length > 0)
+						//if (twoCards.length > 0)
 						//{
-							//for (var m1:int = (twoCardArray0.length - 1); m1 >= 0; m1 -= 2)
+							//for (var m1:int = (twoCards.length - 1); m1 >= 0; m1 -= 2)
 							//{
-								//if ((getCardValue(twoCardArray0[m1]) > lastWinCardValue) && (getCardValue(twoCardArray0[m1]) > lastTiShiCardValue))
+								//if ((getCardValue(twoCards[m1]) > lastWinCardValue) && (getCardValue(twoCards[m1]) > lastTiShiCardValue))
 								//{
 									//bFind = true;
-									//tiShiCards.push(twoCardArray0[m1 - 1]);
-									//tiShiCards.push(twoCardArray0[m1]);
+									//tiShiCards.push(twoCards[m1 - 1]);
+									//tiShiCards.push(twoCards[m1]);
 									//break;
 								//}
 							//}
@@ -735,15 +630,15 @@ package help
 					////找3张
 					//if (m_FindSwitch == 2)
 					//{
-						//if (!bFind && threeCardArray0.length > 0)
+						//if (!bFind && threeCards.length > 0)
 						//{
-							//for (var n1:int = (threeCardArray0.length -1); n1 >= 0; n1 -= 3)
+							//for (var n1:int = (threeCards.length -1); n1 >= 0; n1 -= 3)
 							//{
-								//if ((getCardNormalValue(threeCardArray0[n1]) > lastWinCardValue) && (getCardNormalValue(threeCardArray0[n1]) > lastTiShiCardValue))
+								//if ((getCardNormalValue(threeCards[n1]) > lastWinCardValue) && (getCardNormalValue(threeCards[n1]) > lastTiShiCardValue))
 								//{
 									//bFind = true;
-									//tiShiCards.push(threeCardArray0[n1 - 2]);
-									//tiShiCards.push(threeCardArray0[n1 - 1]);
+									//tiShiCards.push(threeCards[n1 - 2]);
+									//tiShiCards.push(threeCards[n1 - 1]);
 									//break;
 								//}
 							//}
@@ -760,15 +655,15 @@ package help
 					////找4张
 					//if (m_FindSwitch == 3)
 					//{
-						//if (!bFind && fourCardArray0.length > 0)
+						//if (!bFind && fourCards.length > 0)
 						//{
-							//for (var i1:int = (fourCardArray0.length - 1); i1 >= 0; i1 -= 4)
+							//for (var i1:int = (fourCards.length - 1); i1 >= 0; i1 -= 4)
 							//{
-								//if ((getCardNormalValue(fourCardArray0[i1]) > lastWinCardValue) && (getCardNormalValue(fourCardArray0[i1]) > lastTiShiCardValue))
+								//if ((getCardNormalValue(fourCards[i1]) > lastWinCardValue) && (getCardNormalValue(fourCards[i1]) > lastTiShiCardValue))
 								//{
 									//bFind = true;
-									//tiShiCards.push(fourCardArray0[i1 - 3]);
-									//tiShiCards.push(fourCardArray0[i1 - 2]);
+									//tiShiCards.push(fourCards[i1 - 3]);
+									//tiShiCards.push(fourCards[i1 - 2]);
 									//break;
 								//}
 							//}
@@ -785,17 +680,17 @@ package help
 					////找3个的炸弹
 					//if (m_FindSwitch == 4)
 					//{
-						//if (!bFind && threeCardArray0.length > 0)
+						//if (!bFind && threeCards.length > 0)
 						//{
-							//for (var k1:int = (threeCardArray0.length -1); k1 >= 0; k1 -= 3)
+							//for (var k1:int = (threeCards.length -1); k1 >= 0; k1 -= 3)
 							//{
-								//if (getCardNormalValue(threeCardArray0[k1]) <= lastTiShiCardValue)//3个时不区分红十，取普通值
+								//if (getCardNormalValue(threeCards[k1]) <= lastTiShiCardValue)//3个时不区分红十，取普通值
 									//continue;
 								//
 								//bFind = true;
-								//tiShiCards.push(threeCardArray0[k1 - 2]);
-								//tiShiCards.push(threeCardArray0[k1 - 1]);
-								//tiShiCards.push(threeCardArray0[k1]);
+								//tiShiCards.push(threeCards[k1 - 2]);
+								//tiShiCards.push(threeCards[k1 - 1]);
+								//tiShiCards.push(threeCards[k1]);
 								//break;
 							//}
 						//}	
@@ -811,18 +706,18 @@ package help
 					////找4个的炸弹
 					//if (m_FindSwitch == 5)
 					//{
-						//if (!bFind && fourCardArray0.length > 0)
+						//if (!bFind && fourCards.length > 0)
 						//{
-							//for (var g1:int = (fourCardArray0.length - 1); g1 >= 0; g1 -= 4)
+							//for (var g1:int = (fourCards.length - 1); g1 >= 0; g1 -= 4)
 							//{
-								//if (getCardNormalValue(fourCardArray0[g1]) <= lastTiShiCardValue)//4个时不区分红十，取普通值
+								//if (getCardNormalValue(fourCards[g1]) <= lastTiShiCardValue)//4个时不区分红十，取普通值
 									//continue;
 									//
 								//bFind = true;
-								//tiShiCards.push(fourCardArray0[g1 - 3]);
-								//tiShiCards.push(fourCardArray0[g1 - 2]);
-								//tiShiCards.push(fourCardArray0[g1 - 1]);
-								//tiShiCards.push(fourCardArray0[g1]);
+								//tiShiCards.push(fourCards[g1 - 3]);
+								//tiShiCards.push(fourCards[g1 - 2]);
+								//tiShiCards.push(fourCards[g1 - 1]);
+								//tiShiCards.push(fourCards[g1]);
 								//break;
 							//}
 						//}
@@ -864,17 +759,17 @@ package help
 					////找3个的炸弹
 					//if (m_FindSwitch == 1)
 					//{
-						//if (!bFind && threeCardArray0.length > 0)
+						//if (!bFind && threeCards.length > 0)
 						//{
-							//for (var k2:int = (threeCardArray0.length -1); k2 >= 0; k2 -= 3)
+							//for (var k2:int = (threeCards.length -1); k2 >= 0; k2 -= 3)
 							//{
-								//if (getCardNormalValue(threeCardArray0[k2]) <= lastTiShiCardValue)//3个时不区分红十，取普通值
+								//if (getCardNormalValue(threeCards[k2]) <= lastTiShiCardValue)//3个时不区分红十，取普通值
 									//continue;
 								//
 								//bFind = true;
-								//tiShiCards.push(threeCardArray0[k2 - 2]);
-								//tiShiCards.push(threeCardArray0[k2 - 1]);
-								//tiShiCards.push(threeCardArray0[k2]);
+								//tiShiCards.push(threeCards[k2 - 2]);
+								//tiShiCards.push(threeCards[k2 - 1]);
+								//tiShiCards.push(threeCards[k2]);
 								//break;
 							//}
 						//}	
@@ -890,18 +785,18 @@ package help
 					////找4个的炸弹
 					//if (m_FindSwitch == 2)
 					//{
-						//if (!bFind && fourCardArray0.length > 0)
+						//if (!bFind && fourCards.length > 0)
 						//{
-							//for (var g2:int = (fourCardArray0.length - 1); g2 >= 0; g2 -= 4)
+							//for (var g2:int = (fourCards.length - 1); g2 >= 0; g2 -= 4)
 							//{
-								//if (getCardNormalValue(fourCardArray0[g2]) <= lastTiShiCardValue)//4个时不区分红十，取普通值
+								//if (getCardNormalValue(fourCards[g2]) <= lastTiShiCardValue)//4个时不区分红十，取普通值
 									//continue;
 									//
 								//bFind = true;
-								//tiShiCards.push(fourCardArray0[g2 - 3]);
-								//tiShiCards.push(fourCardArray0[g2 - 2]);
-								//tiShiCards.push(fourCardArray0[g2 - 1]);
-								//tiShiCards.push(fourCardArray0[g2]);
+								//tiShiCards.push(fourCards[g2 - 3]);
+								//tiShiCards.push(fourCards[g2 - 2]);
+								//tiShiCards.push(fourCards[g2 - 1]);
+								//tiShiCards.push(fourCards[g2]);
 								//break;
 							//}
 						//}
@@ -943,18 +838,18 @@ package help
 					////找4个的炸弹
 					//if (m_FindSwitch == 1)
 					//{
-						//if (!bFind && fourCardArray0.length > 0)
+						//if (!bFind && fourCards.length > 0)
 						//{
-							//for (var g3:int = (fourCardArray0.length - 1); g3 >= 0; g3 -= 4)
+							//for (var g3:int = (fourCards.length - 1); g3 >= 0; g3 -= 4)
 							//{
-								//if (getCardNormalValue(fourCardArray0[g3]) <= lastTiShiCardValue)//4个时不区分红十，取普通值
+								//if (getCardNormalValue(fourCards[g3]) <= lastTiShiCardValue)//4个时不区分红十，取普通值
 									//continue;
 									//
 								//bFind = true;
-								//tiShiCards.push(fourCardArray0[g3 - 3]);
-								//tiShiCards.push(fourCardArray0[g3 - 2]);
-								//tiShiCards.push(fourCardArray0[g3 - 1]);
-								//tiShiCards.push(fourCardArray0[g3]);
+								//tiShiCards.push(fourCards[g3 - 3]);
+								//tiShiCards.push(fourCards[g3 - 2]);
+								//tiShiCards.push(fourCards[g3 - 1]);
+								//tiShiCards.push(fourCards[g3]);
 								//break;
 							//}
 						//}
@@ -1029,17 +924,17 @@ package help
 					////找3个的炸弹
 					//if (m_FindSwitch == 2)
 					//{
-						//if (!bFind && threeCardArray0.length > 0)
+						//if (!bFind && threeCards.length > 0)
 						//{
-							//for (var k4:int = (threeCardArray0.length -1); k4 >= 0; k4 -= 3)
+							//for (var k4:int = (threeCards.length -1); k4 >= 0; k4 -= 3)
 							//{
-								//if (getCardNormalValue(threeCardArray0[k4]) <= lastTiShiCardValue)//3个时不区分红十，取普通值
+								//if (getCardNormalValue(threeCards[k4]) <= lastTiShiCardValue)//3个时不区分红十，取普通值
 									//continue;
 								//
 								//bFind = true;
-								//tiShiCards.push(threeCardArray0[k4 - 2]);
-								//tiShiCards.push(threeCardArray0[k4 - 1]);
-								//tiShiCards.push(threeCardArray0[k4]);
+								//tiShiCards.push(threeCards[k4 - 2]);
+								//tiShiCards.push(threeCards[k4 - 1]);
+								//tiShiCards.push(threeCards[k4]);
 								//break;
 							//}
 						//}	
@@ -1055,18 +950,18 @@ package help
 					////找4个的炸弹
 					//if (m_FindSwitch == 3)
 					//{
-						//if (!bFind && fourCardArray0.length > 0)
+						//if (!bFind && fourCards.length > 0)
 						//{
-							//for (var g4:int = (fourCardArray0.length - 1); g4 >= 0; g4 -= 4)
+							//for (var g4:int = (fourCards.length - 1); g4 >= 0; g4 -= 4)
 							//{
-								//if (getCardNormalValue(fourCardArray0[g4]) <= lastTiShiCardValue)//4个时不区分红十，取普通值
+								//if (getCardNormalValue(fourCards[g4]) <= lastTiShiCardValue)//4个时不区分红十，取普通值
 									//continue;
 									//
 								//bFind = true;
-								//tiShiCards.push(fourCardArray0[g4 - 3]);
-								//tiShiCards.push(fourCardArray0[g4 - 2]);
-								//tiShiCards.push(fourCardArray0[g4 - 1]);
-								//tiShiCards.push(fourCardArray0[g4]);
+								//tiShiCards.push(fourCards[g4 - 3]);
+								//tiShiCards.push(fourCards[g4 - 2]);
+								//tiShiCards.push(fourCards[g4 - 1]);
+								//tiShiCards.push(fourCards[g4]);
 								//break;
 							//}
 						//}
@@ -1141,17 +1036,17 @@ package help
 					////找3个的炸弹
 					//if (m_FindSwitch == 2)
 					//{
-						//if (!bFind && threeCardArray0.length > 0)
+						//if (!bFind && threeCards.length > 0)
 						//{
-							//for (var k5:int = (threeCardArray0.length -1); k5 >= 0; k5 -= 3)
+							//for (var k5:int = (threeCards.length -1); k5 >= 0; k5 -= 3)
 							//{
-								//if (getCardNormalValue(threeCardArray0[k5]) <= lastTiShiCardValue)//3个时不区分红十，取普通值
+								//if (getCardNormalValue(threeCards[k5]) <= lastTiShiCardValue)//3个时不区分红十，取普通值
 									//continue;
 								//
 								//bFind = true;
-								//tiShiCards.push(threeCardArray0[k5 - 2]);
-								//tiShiCards.push(threeCardArray0[k5 - 1]);
-								//tiShiCards.push(threeCardArray0[k5]);
+								//tiShiCards.push(threeCards[k5 - 2]);
+								//tiShiCards.push(threeCards[k5 - 1]);
+								//tiShiCards.push(threeCards[k5]);
 								//break;
 							//}
 						//}	
@@ -1167,18 +1062,18 @@ package help
 					////找4个的炸弹
 					//if (m_FindSwitch == 3)
 					//{
-						//if (!bFind && fourCardArray0.length > 0)
+						//if (!bFind && fourCards.length > 0)
 						//{
-							//for (var g5:int = (fourCardArray0.length - 1); g5 >= 0; g5 -= 4)
+							//for (var g5:int = (fourCards.length - 1); g5 >= 0; g5 -= 4)
 							//{
-								//if (getCardNormalValue(fourCardArray0[g5]) <= lastTiShiCardValue)//4个时不区分红十，取普通值
+								//if (getCardNormalValue(fourCards[g5]) <= lastTiShiCardValue)//4个时不区分红十，取普通值
 									//continue;
 									//
 								//bFind = true;
-								//tiShiCards.push(fourCardArray0[g5 - 3]);
-								//tiShiCards.push(fourCardArray0[g5 - 2]);
-								//tiShiCards.push(fourCardArray0[g5 - 1]);
-								//tiShiCards.push(fourCardArray0[g5]);
+								//tiShiCards.push(fourCards[g5 - 3]);
+								//tiShiCards.push(fourCards[g5 - 2]);
+								//tiShiCards.push(fourCards[g5 - 1]);
+								//tiShiCards.push(fourCards[g5]);
 								//break;
 							//}
 						//}
@@ -1209,7 +1104,7 @@ package help
 					//if (bFind)
 						//nRet = 1;
 				//}
-			//}
+			}
 			
 			return nRet;
 		}

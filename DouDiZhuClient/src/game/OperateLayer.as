@@ -1,5 +1,6 @@
 package game 
 {
+	import help.DanJiLogic;
 	import mylib.Asset;
 	import mylib.MyButton;
 	import starling.display.Sprite;
@@ -147,17 +148,15 @@ package game
 			{
 				var tempButton:MyButton = e.target as MyButton;
 				if (tempButton == mJiao)
-					DouDiZhu.sDouDiZhu.JiaoDiZhu(0, true, 1);
+					DanJiLogic.sDanJiLogic.JiaoDiZhu(0, true);
 				else if (tempButton == mBuJiao)
-					DouDiZhu.sDouDiZhu.JiaoDiZhu(0, false, 1);
+					DanJiLogic.sDanJiLogic.JiaoDiZhu(0, false);
 				else if (tempButton == mQiang)
-					DouDiZhu.sDouDiZhu.QiangDiZhu(0, true, 1);
+					DanJiLogic.sDanJiLogic.QiangDiZhu(0, true);
 				else if (tempButton == mBuQiang)
-					DouDiZhu.sDouDiZhu.QiangDiZhu(0, false, 1);
+					DanJiLogic.sDanJiLogic.QiangDiZhu(0, false);
 				else if (tempButton == mChuPai)
-				{
-					DouDiZhu.sDouDiZhu.OutCard(0, PokerManagerLayer.sPokerManagerLayer.GetUpPokers(), 1);
-				}
+					DanJiLogic.sDanJiLogic.OutCard(0, PokerManagerLayer.sPokerManagerLayer.GetUpPokers());
 			}
 		}
 	}
